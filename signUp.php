@@ -26,7 +26,7 @@
    var limiteEleccion = 3;
    
    $('input.temas').on('change', function(evt) {
-      if($("input[name='tema']:checked").length > limiteEleccion) {
+      if($("input[name='tema[]']:checked").length > limiteEleccion) {
          this.checked = false;
       }
    });
@@ -41,24 +41,24 @@
             <div class="card my-5">
                <div class="card-body">
                   <h5 class="card-title text-center">Registro</h5>
-                  <form action="insertUser.php">
+                  <form action="insertUser.php" method="post" class="form-group">
                      <label for="inputUserName">Nombre de usuario</label>
-                     <input type="text" id="inputUserName" class="form-control" required autofocus>
+                     <input type="text" id="inputUserName" class="form-control" required autofocus name="inputUserName">
 
                      <label for="inputAge">Edad</label>
-                     <input class="form-control" type="number" value="18" id="inputAge" min="0">
+                     <input class="form-control" type="number" value="18" id="inputAge" min="0" name="inputAge">
 
                      <fieldset class="form-group my-2">
                         <div class="row">
                            <legend class="col-form-label col-sm-2 pt-0">Sexo</legend>
                            <div class="custom-control custom-radio custom-control-inline">
-                              <input type="radio" id="radioWomen" class="custom-control-input" name="sex" required
-                                 checked>
-                              <label class="custom-control-label" for="radioWomen">Hombre</label>
+                              <input type="radio" id="radioMen" class="custom-control-input" name="sex" requiredAge
+                                 checked value="1">
+                              <label class="custom-control-label" for="radioMen">Hombre</label>
                            </div>
                            <div class="custom-control custom-radio custom-control-inline">
-                              <input type="radio" id="radioMen" class="custom-control-input" name="sex" required>
-                              <label class="custom-control-label" for="radioMen">Mujer</label>
+                              <input type="radio" id="radioWomen" class="custom-control-input" name="sex" required value="2">
+                              <label class="custom-control-label" for="radioWomen">Mujer</label>
                            </div>
                         </div>
                      </fieldset>
@@ -68,30 +68,33 @@
                            <legend class="col-form-label col-sm-4 pt-0">Estado civil</legend>
                            <div class="custom-control custom-radio custom-control-inline">
                               <input type="radio" id="radioSingle" class="custom-control-input" name="maritalStatus"
-                                 required checked>
+                                 required checked value="1">
                               <label class="custom-control-label" for="radioSingle">Solter@</label>
                            </div>
                            <div class="custom-control custom-radio custom-control-inline">
                               <input type="radio" id="radioMarried" class="custom-control-input" name="maritalStatus"
-                                 required>
+                                 required value="2">
                               <label class="custom-control-label" for="radioMarried">Casad@</label>
                            </div>
                            <div class="custom-control custom-radio custom-control-inline">
                               <input type="radio" id="radioWidow" class="custom-control-input" name="maritalStatus"
-                                 required>
+                                 required value="3">
                               <label class="custom-control-label" for="radioWidow">Viud@</label>
                            </div>
                         </div>
                      </fieldset>
 
                      <label for="selectedTopics">Temas que te interesan</label>
+                     <small class="form-text text-muted">Máximo 3 temas</small>
                      <?php 
                         include ("dataBase.php");
 
                         $base = new DataBase();
                         $temas = array();
+                        $temasId = array();
 
                         $temas = $base->getTemas();
+                        $temasId = $base->getTemasId();
 
                         for($i=0; $i<sizeof($temas); $i++)
                         {
@@ -99,7 +102,7 @@
                      <div class="input-group mb-1">
                         <div class="input-group-prepend">
                            <div class="input-group-text">
-                              <input type="checkbox" aria-label="Checkbox for following text input" class="temas" name="tema">
+                              <input type="checkbox" aria-label="Checkbox for following text input" class="temas" name="tema[]" value="<?php echo $temasId[$i]; ?>">
                            </div>
                         </div>
                         <p class="form-control" aria-label="Text input with checkbox"><?php echo $temas[$i]; ?></p>
@@ -110,9 +113,9 @@
                      ?>
 
                      <label for="inputPassword">Contraseña</label>
-                     <input type="password" id="inputPassword" class="form-control" required>
+                     <input type="password" id="inputPassword" class="form-control" required name="password">
                      <label for="inputPassword2">Confirma contraseña</label>
-                     <input type="password" id="inputPassword2" class="form-control" required>
+                     <input type="password" id="inputPassword2" class="form-control" required name="password2">
                      <button class="btn btn-primary btn-block text-uppercase mt-4" type="submit">Registrarme</button>
                   </form>
                </div>
