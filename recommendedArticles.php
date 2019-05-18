@@ -20,9 +20,7 @@ while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
   $tema = $row->nombre;
   $temas[] = $tema;
 }
-$articuloId = 1;
 
-//Consulta de la imagen
 $sql = "SELECT * FROM Articulo";
 $result = $conn->query($sql);
 
@@ -46,7 +44,7 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   $idUsuario = $row2->idUsuario;
   $idUsuarios[] = $idUsuario;
 }
-
+$idUser = 1;
 ?>
 
 <!DOCTYPE html>
@@ -54,12 +52,12 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta idArticulo="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Proyecto BM</title>
   <!-- Importaciones -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -126,25 +124,19 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   </nav>
 
   <div class="container">
-  <h1 class="text-center text-primary p-3">Recomendados</h1>
+    <h1 class="text-center text-primary p-3">Recomendados</h1>
 
     <div class="row">
-
-
-
       <?php for ($x = 0; $x < sizeof($titulos); $x++) { ?>
-        <div class="col-4">
+        <div class="col-sm-12 col-md-6 col-lg-4">
           <div class="shadow p-2 mb-5 bg-white rounded">
             <img class="card-img-top rounded" src="<?php echo $images[$x]; ?>">
             <div class="card-body">
-
-              <div class="row justify-content-center my-3">
-                <button type="button" name="" id="" class="btn btn-primary mx-2">👍🏻</button>
-                <button type="button" name="" id="" class="btn btn-primary mx-2">👎🏻</button>
-                <button type="button" name="" id="" class="btn btn-primary mx-2">😐</button>
+              <div class="row justify-content-center mb-2">
+                <button type="button" id="like-<?php echo $ids[$x]; ?>-<?php echo $idUser; ?>" class="btn mx-2">👍🏻</button>
+                <button type="button" id="dislike-<?php echo $ids[$x]; ?>-<?php echo $idUser; ?>" class="btn mx-2">👎🏻</button>
+                <button type="button" id="mhe-<?php echo $ids[$x]; ?>-<?php echo $idUser; ?>" class="btn mx-2">😐</button>
               </div>
-
-
               <h3 class="card-title"><?php echo $titulos[$x]; ?></h3>
               <h5 class="card-title"><?php echo $subtitulos[$x]; ?></h5>
               <h6 class="card-title"><?php echo $idTemas[$x]; ?></h6>
@@ -156,33 +148,64 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
           </div>
         </div>
       <?php } ?>
-
-      <!-- <div class="col-4">
-        <div class="shadow p-2 mb-5 bg-white rounded">
-          <img class="card-img-top rounded" src="https://picsum.photos/500/500?random&t=${Math.random()}" alt="Card image cap">
-          <div class="card-body">
-            <div class="d-flex flex-row">
-              <h3 class="card-title">Título</h3>
-              <div class="ml-3">
-                <button type="button" name="" id="" class="btn btn-primary">👍🏻</button>
-                <button type="button" name="" id="" class="btn btn-primary">👎🏻</button>
-                <button type="button" name="" id="" class="btn btn-primary">😐</button>
-              </div>
-            </div>
-            <h5 class="card-title">Subtitulo</h5>
-            <h6 class="card-title">Tema</h6>
-            <p class="card-text">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex in voluptate ullam debitis quisquam natus suscipit, ipsam quasi impedit aliquam ipsum fugit, libero magnam alias nisi officiis dignissimos tempore earum. Quam, animi rem autem similique vitae, nihil ut corporis porro dolor minima aliquam iusto rerum voluptates veritatis quaerat numquam possimus ad earum architecto sed excepturi, ipsum blanditiis ratione. Excepturi, quam.
-            </p>
-            <p class="card-text">
-              <small class="text-muted">01/Junio/2019</small>
-            </p>
-          </div>
-        </div>
-      </div> -->
-
     </div>
+
   </div>
+  <script>
+    $("button[id|='like']").click(function() {
+      console.log($(this));
+      var idBoton = $(this).attr('id');
+      idArticulo = idBoton.charAt(5);
+      idUsuario = idBoton.charAt(7);
+      console.log("GUSTA idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
+      $(this).toggleClass("btn-primary");
+
+      let btnDislikeId ="dislike-"+idArticulo+"-"+idUsuario;
+      let btnDislike = $("button[id="+btnDislikeId+"]");
+      let btnMheId ="mhe-"+idArticulo+"-"+idUsuario;
+      let btnMhe = $("button[id="+btnMheId+"]");
+
+      if($(this).hasClass('btn-primary')){
+        btnDislike.removeClass('btn-primary')
+        btnMhe.removeClass('btn-primary')
+      }
+    });
+
+    $("button[id|='dislike']").click(function() {
+      var idBoton = $(this).attr('id');
+      idArticulo = idBoton.charAt(8);
+      idUsuario = idBoton.charAt(10);
+      console.log("Disgusta idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
+      $(this).toggleClass("btn-primary");
+
+      let btnLikeId ="like-"+idArticulo+"-"+idUsuario;
+      let btnlike = $("button[id="+btnLikeId+"]");
+      let btnMheId ="mhe-"+idArticulo+"-"+idUsuario;
+      let btnMhe = $("button[id="+btnMheId+"]");
+
+      if($(this).hasClass('btn-primary')){
+        btnlike.removeClass('btn-primary')
+        btnMhe.removeClass('btn-primary')
+      }
+    });
+
+    $("button[id|='mhe']").click(function() {
+      var idBoton = $(this).attr('id');
+      idArticulo = idBoton.charAt(4);
+      idUsuario = idBoton.charAt(6);
+      console.log("Mhe idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
+      $(this).toggleClass("btn-primary");
+
+      let btnLikeId ="like-"+idArticulo+"-"+idUsuario;
+      let btnLike = $("button[id="+btnLikeId+"]");
+      let btnDislikeId ="dislike-"+idArticulo+"-"+idUsuario;
+      let btnDislike = $("button[id="+btnDislikeId+"]");
+      if($(this).hasClass('btn-primary')){
+        btnLike.removeClass('btn-primary')
+        btnDislike.removeClass('btn-primary')
+      }
+    });
+  </script>
 </body>
 
 </html>
