@@ -59,7 +59,7 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   }
   // echo $artGusta;
   $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor, $idUser, $artGusta);
-  $articulos[] = $articulo; 
+  $articulos[] = $articulo;
 }
 
 ?>
@@ -102,20 +102,21 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
           <a class="nav-link" href="userArticlesByLikes.html">Más gustados</a>
         </li>
       </ul>
+
+      <ul class="nav justify-content-end">
+        <li class="nav-item dropdown bg-light">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Menú
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="myArticles.html">Mis articulos</a>
+            <a class="dropdown-item" href="reports.html">Reportes</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal">Salir</a>
+          </div>
+        </li>
+      </ul>
     </div>
 
-    <ul class=" nav justify-content-end">
-      <li class="nav-item dropdown bg-light">
-        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Menú
-        </a>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="myArticles.html">Mis articulos</a>
-          <a class="dropdown-item" href="reports.html">Reportes</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal">Salir</a>
-        </div>
-      </li>
-    </ul>
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -140,25 +141,25 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
 
   </nav>
 
-  <div class="container">
+  <div class="container-fluid px-5">
     <h1 class="text-center text-primary p-3">Recomendados</h1>
 
     <div class="row">
       <?php for ($x = 0; $x < sizeof($articulos); $x++) { ?>
-        <div class="col-sm-12 col-md-6 col-lg-4">
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
           <div class="shadow p-2 mb-5 bg-white rounded">
             <img class="card-img-top rounded" src="<?php echo $articulos[$x]->getPathImagen(); ?>">
             <div class="card-body">
-              <div class="row justify-content-center mb-2">
-                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 1) echo "btn-primary"; ?> mx-2">👍🏻</button>
-                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 2) echo "btn-primary"; ?> mx-2">👎🏻</button>
-                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 3) echo "btn-primary"; ?> mx-2">😐</button>
-              </div>
               <h3 class="card-title"><?php echo $articulos[$x]->getTitulo(); ?></h3>
               <h5 class="card-title"><?php echo $articulos[$x]->getSubtitulo(); ?></h5>
               <h5><span class="badge badge-pill badge-info"><?php echo $articulos[$x]->getTema(); ?></span></h5>
               <!-- <h6 class="card-title"><?php echo $articulos[$x]->getTema(); ?></h6> -->
               <p class="card-text"><?php echo $articulos[$x]->getContenido(); ?></p>
+              <div class="row justify-content-center mb-2">
+                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 1) echo "btn-primary"; ?> mx-2">👍🏻</button>
+                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 2) echo "btn-primary"; ?> mx-2">👎🏻</button>
+                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 3) echo "btn-primary"; ?> mx-2">😐</button>
+              </div>
               <p class="card-text">
                 <small class="text-muted"><?php echo $articulos[$x]->getFecha(); ?></small>
               </p>
@@ -172,7 +173,6 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
 
   <script>
     $("button[id|='like']").click(function() {
-      console.log($(this));
       var idBoton = $(this).attr('id');
       idArticulo = idBoton.charAt(5);
       idUsuario = idBoton.charAt(7);
@@ -200,7 +200,7 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
             if (response == "Guardado")
               alert("Se guardo");
             else
-              alert("ERROR:", response);
+              alert(response);
             // TODO: Actualizar gustos
           }
         });
@@ -235,7 +235,7 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
             if (response == "Guardado")
               alert("Se guardo");
             else
-              alert("ERROR:", response);
+              alert(response);
             // TODO: Actualizar gustos
           }
         });
