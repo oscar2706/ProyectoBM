@@ -21,8 +21,14 @@
    </head>
 
    <body>
+      <?php
+         include ("userClass.php");
+         session_start();
+
+         $usuario = $_SESSION['usuario'];
+      ?>
       <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-         <a class="navbar-brand" href="">Proyecto BM</a>
+         <a class="navbar-brand" href="">Proyecto BM <?php echo $usuario->getNombre(); ?></a>
          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                  aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

@@ -11,5 +11,5 @@ $base = new dataBase();
 
 $base->addUser($nombre, $contraseña, $edad, $genero, $estadoCivil, $_POST['tema']['0'], $_POST['tema']['1'], $_POST['tema']['2']);
 
-header('Location: recommendedArticles.html');
+header('Location: recommendedArticles.php');
 ?>

@@ -38,6 +38,7 @@
 
         function addUser($nombre, $contraseña, $edad, $idGenero, $idEstadoCivil, $tema1 =  false, $tema2 = false, $tema3 = false) {
             include ("connection.php");
+            include ("userClass.php");
 
             $statement = "INSERT INTO usuario (nombre, contraseña, edad, idGenero, idEstadoCivil) VALUES (:nombre, :contrasena, :edad, :idGenero, :idEstadoCivil)";
             $query = $conn->prepare($statement);
@@ -67,6 +68,43 @@
             $query3->bindParam(':idTema3', $tema3, PDO::PARAM_INT);
             $query3->bindParam(':meGusta3', $valorInicial, PDO::PARAM_INT);
             $query3->execute();
+
+            session_start();
+
+            $_SESSION['usuario'] = new User($usuario->idUsuario, $nombre, $contraseña, $edad, $idGenero, $idEstadoCivil);
+        }
+
+        function loginUser($nombre, $contraseña) {
+            include ("connection.php");
+            include ("userClass.php");
+
+            $statement = "SELECT count(*) AS filas FROM usuario WHERE nombre = :nombre AND contraseña = :contrasena";
+            $query = $conn->prepare($statement);
+            $query->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $query->bindParam(':contrasena', $contraseña, PDO::PARAM_STR);
+            $query->execute();
+            $filas = $query->fetch(PDO::FETCH_OBJ);
+
+            session_start();
+
+            if($filas->filas > 0)
+            {
+                $statement2 = "SELECT * FROM usuario WHERE nombre = :nombre AND contraseña = :contrasena";
+                $query2 = $conn->prepare($statement2);
+                $query2->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+                $query2->bindParam(':contrasena', $contraseña, PDO::PARAM_STR);
+                $query2->execute();
+                $usuario = $query2->fetch(PDO::FETCH_OBJ);
+
+                $_SESSION['usuario'] = new User($usuario->idUsuario, $usuario->nombre, $usuario->contraseña, $usuario->edad, $usuario->idGenero, $usuario->idEstadoCivil);
+                $_SESSION['bandera']=0;
+                return 1;
+            }
+            else
+            {
+                $_SESSION['bandera']=1;
+                return 0;
+            }
         }
     }
 ?>
