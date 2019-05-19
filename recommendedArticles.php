@@ -144,7 +144,7 @@ $idUser = 1;
               </div>
               <h3 class="card-title"><?php echo $articulos[$x]->getTitulo(); ?></h3>
               <h5 class="card-title"><?php echo $articulos[$x]->getSubtitulo(); ?></h5>
-              <h5><span class="badge badge-info"><?php echo $articulos[$x]->getTema(); ?></span></h5>
+              <h5><span class="badge badge-pill badge-info"><?php echo $articulos[$x]->getTema(); ?></span></h5>
               <!-- <h6 class="card-title"><?php echo $articulos[$x]->getTema(); ?></h6> -->
               <p class="card-text"><?php echo $articulos[$x]->getContenido(); ?></p>
               <p class="card-text">
@@ -176,16 +176,19 @@ $idUser = 1;
         btnDislike.removeClass('btn-primary');
         btnMhe.removeClass('btn-primary');
 
-        let y = 0;
         $.ajax({
           url: 'updateLike.php',
           method: 'POST',
           data: {
             idArticulo: idArticulo,
             idUsuario: idUsuario,
-            gusta: "gusta"
+            reaccion: 1
           },
           success: function(response) {
+            if (response == "Guardado")
+              alert("Se guardo");
+            else
+              alert("ERROR:", response);
             // TODO: Actualizar gustos
           }
         });
@@ -228,7 +231,23 @@ $idUser = 1;
       if ($(this).hasClass('btn-primary')) {
         btnlike.removeClass('btn-primary');
         btnMhe.removeClass('btn-primary');
-       
+
+        $.ajax({
+          url: 'updateLike.php',
+          method: 'POST',
+          data: {
+            idArticulo: idArticulo,
+            idUsuario: idUsuario,
+            reaccion: 2
+          },
+          success: function(response) {
+            if (response == "Guardado")
+              alert("Se guardo");
+            else
+              alert("ERROR:", response);
+            // TODO: Actualizar gustos
+          }
+        });
       }
     });
 
@@ -256,6 +275,23 @@ $idUser = 1;
       if ($(this).hasClass('btn-primary')) {
         btnLike.removeClass('btn-primary');
         btnDislike.removeClass('btn-primary');
+
+        $.ajax({
+          url: 'updateLike.php',
+          method: 'POST',
+          data: {
+            idArticulo: idArticulo,
+            idUsuario: idUsuario,
+            reaccion: 3
+          },
+          success: function(response) {
+            if (response == "Guardado")
+              alert(response);
+            else
+              $(this).toggleClass("btn-primary");
+            // TODO: Actualizar gustos
+          }
+        });
       }
     });
   </script>
