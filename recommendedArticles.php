@@ -1,3 +1,45 @@
+<?php
+include("ClassArticulo.php");
+$db_servername = "localhost";
+$db_usuario = "root";
+$db_contrasena = "";
+$dbname = "proyectoBM";
+
+try {
+  $conn = new PDO("mysql:host=$db_servername;dbname=$dbname", $db_usuario, $db_contrasena);
+  // set the PDO error mode to exception
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $conn->exec("SET NAMES 'utf8';");
+} catch (PDOException $e) {
+  echo $sql . "<br>" . $e->getMessage();
+}
+$sql = "SELECT nombre FROM Tema";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+
+while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+  $tema = $row->nombre;
+  $temas[] = $tema;
+}
+
+$sql = "SELECT * FROM Articulo";
+$result = $conn->query($sql);
+
+while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
+  $id = $row2->idArticulo;
+  $titulo = $row2->titulo;
+  $subtitulo = $row2->subtitulo;
+  $contenido = $row2->contenido;
+  $fecha = $row2->fechaCreacion;
+  $img = $row2->tipoImagen;
+  $idTema = $row2->idTema;
+  $idAutor = $row2->idUsuario;
+  $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor);
+  $articulos[] = $articulo;
+}
+$idUser = 1;
+?>
+
 <!DOCTYPE html>
 <html lang="es_MX">
 
@@ -89,22 +131,66 @@
 
       </nav>
 
-      <div class="container">
-         <h1 class="text-center text-primary p-3">Recomendados</h1>
+    <div class="row">
+      <?php for ($x = 0; $x < sizeof($articulos); $x++) { ?>
+        <div class="col-sm-12 col-md-6 col-lg-4">
+          <div class="shadow p-2 mb-5 bg-white rounded">
+            <img class="card-img-top rounded" src="<?php echo $articulos[$x]->getPathImagen(); ?>">
+            <div class="card-body">
+              <div class="row justify-content-center mb-2">
+                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👍🏻</button>
+                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👎🏻</button>
+                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">😐</button>
+              </div>
+              <h3 class="card-title"><?php echo $articulos[$x]->getTitulo(); ?></h3>
+              <h5 class="card-title"><?php echo $articulos[$x]->getSubtitulo(); ?></h5>
+              <h5><span class="badge badge-info"><?php echo $articulos[$x]->getTema(); ?></span></h5>
+              <!-- <h6 class="card-title"><?php echo $articulos[$x]->getTema(); ?></h6> -->
+              <p class="card-text"><?php echo $articulos[$x]->getContenido(); ?></p>
+              <p class="card-text">
+                <small class="text-muted"><?php echo $articulos[$x]->getFecha(); ?></small>
+              </p>
+            </div>
+          </div>
+        </div>
+      <?php } ?>
+    </div>
 
-         <div class="card-columns">
-            <div class="card">
-               <img class="card-img-top" src="https://picsum.photos/500/500?random&t=${Math.random()}"
-                    alt="Card image cap">
-               <div class="card-body">
-                  <div class="d-flex flex-row">
-                     <h3 class="card-title">Título</h3>
-                     <div class="ml-3">
-                        <button type="button" name="" id="" class="btn btn-primary">👍🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">👎🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">😐</button>
-                     </div>
-                  </div>
+  </div>
+
+  <script>
+    $("button[id|='like']").click(function() {
+      console.log($(this));
+      var idBoton = $(this).attr('id');
+      idArticulo = idBoton.charAt(5);
+      idUsuario = idBoton.charAt(7);
+      console.log("GUSTA idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
+      $(this).toggleClass("btn-primary");
+
+      let btnDislikeId = "dislike-" + idArticulo + "-" + idUsuario;
+      let btnDislike = $("button[id=" + btnDislikeId + "]");
+      let btnMheId = "mhe-" + idArticulo + "-" + idUsuario;
+      let btnMhe = $("button[id=" + btnMheId + "]");
+
+      if ($(this).hasClass('btn-primary')) {
+        btnDislike.removeClass('btn-primary');
+        btnMhe.removeClass('btn-primary');
+
+        let y = 0;
+        $.ajax({
+          url: 'updateLike.php',
+          method: 'POST',
+          data: {
+            idArticulo: idArticulo,
+            idUsuario: idUsuario,
+            gusta: "gusta"
+          },
+          success: function(response) {
+            // TODO: Actualizar gustos
+          }
+        });
+      }
+    });
 
                   <h5 class="card-title">Subtitulo</h5>
                   <h6 class="card-title">Tema</h6>
@@ -134,117 +220,17 @@
                      </div>
                   </div>
 
-                  <h5 class="card-title">Subtitulo</h5>
-                  <h6 class="card-title">Tema</h6>
-                  <p class="card-text">
-                     Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex in voluptate ullam debitis quisquam
-                     natus
-                     suscipit, ipsam quasi impedit aliquam ipsum fugit, libero magnam alias nisi officiis dignissimos
-                     tempore earum.
-                     Quam, animi rem autem similique vitae, nihil ut corporis porro dolor minima aliquam iusto rerum
-                     voluptates veritatis quaerat numquam possimus ad earum architecto sed excepturi, ipsum
-                     blanditiis
-                     ratione. Excepturi, quam.
-                  </p>
-                  <p class="card-text"><small class="text-muted">01/Junio/2019</small></p>
-               </div>
-            </div>
-            <div class="card">
-               <img class="card-img-top" src="https://picsum.photos/500/500?random&t=${Math.random()}"
-                    alt="Card image cap">
-               <div class="card-body">
-                  <div class="d-flex flex-row">
-                     <h3 class="card-title">Título</h3>
-                     <div class="ml-3">
-                        <button type="button" name="" id="" class="btn btn-primary">👍🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">👎🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">😐</button>
-                     </div>
-                  </div>
+      let btnLikeId = "like-" + idArticulo + "-" + idUsuario;
+      let btnlike = $("button[id=" + btnLikeId + "]");
+      let btnMheId = "mhe-" + idArticulo + "-" + idUsuario;
+      let btnMhe = $("button[id=" + btnMheId + "]");
 
-                  <h5 class="card-title">Subtitulo</h5>
-                  <h6 class="card-title">Tema</h6>
-                  <p class="card-text">
-                     Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex in voluptate ullam debitis quisquam
-                     natus
-                     suscipit, ipsam quasi impedit aliquam ipsum fugit, libero magnam alias nisi officiis dignissimos
-                     tempore earum.
-                     Quam, animi rem autem similique vitae, nihil ut corporis porro dolor minima aliquam iusto rerum
-                     voluptates veritatis quaerat numquam possimus ad earum architecto sed excepturi, ipsum
-                     blanditiis
-                     ratione. Excepturi, quam.
-                  </p>
-                  <p class="card-text"><small class="text-muted">01/Junio/2019</small></p>
-               </div>
-            </div>
-            <div class="card">
-               <img class="card-img-top" src="https://picsum.photos/500/500?random&t=${Math.random()}"
-                    alt="Card image cap">
-               <div class="card-body">
-                  <div class="d-flex flex-row">
-                     <h3 class="card-title">Título</h3>
-                     <div class="ml-3">
-                        <button type="button" name="" id="" class="btn btn-primary">👍🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">👎🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">😐</button>
-                     </div>
-                  </div>
-
-                  <h5 class="card-title">Subtitulo</h5>
-                  <h6 class="card-title">Tema</h6>
-                  <p class="card-text">
-                     Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex in voluptate ullam debitis quisquam
-                     natus
-                     suscipit, ipsam quasi impedit aliquam ipsum fugit, libero magnam alias nisi officiis dignissimos
-                     tempore earum.
-                     Quam, animi rem autem similique vitae, nihil ut corporis porro dolor minima aliquam iusto rerum
-                     voluptates veritatis quaerat numquam possimus ad earum architecto sed excepturi, ipsum
-                     blanditiis
-                     ratione. Excepturi, quam.
-                  </p>
-                  <p class="card-text"><small class="text-muted">01/Junio/2019</small></p>
-               </div>
-            </div>
-            <div class="card">
-               <img class="card-img-top" src="https://picsum.photos/500/500?random&t=${Math.random()}"
-                    alt="Card image cap">
-               <div class="card-body">
-                  <div class="d-flex flex-row">
-                     <h3 class="card-title">Título</h3>
-                     <div class="ml-3">
-                        <button type="button" name="" id="" class="btn btn-primary">👍🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">👎🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">😐</button>
-                     </div>
-                  </div>
-
-                  <h5 class="card-title">Subtitulo</h5>
-                  <h6 class="card-title">Tema</h6>
-                  <p class="card-text">
-                     Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex in voluptate ullam debitis quisquam
-                     natus
-                     suscipit, ipsam quasi impedit aliquam ipsum fugit, libero magnam alias nisi officiis dignissimos
-                     tempore earum.
-                     Quam, animi rem autem similique vitae, nihil ut corporis porro dolor minima aliquam iusto rerum
-                     voluptates veritatis quaerat numquam possimus ad earum architecto sed excepturi, ipsum
-                     blanditiis
-                     ratione. Excepturi, quam.
-                  </p>
-                  <p class="card-text"><small class="text-muted">01/Junio/2019</small></p>
-               </div>
-            </div>
-            <div class="card">
-               <img class="card-img-top" src="https://picsum.photos/500/500?random&t=${Math.random()}"
-                    alt="Card image cap">
-               <div class="card-body">
-                  <div class="d-flex flex-row">
-                     <h3 class="card-title">Título</h3>
-                     <div class="ml-3">
-                        <button type="button" name="" id="" class="btn btn-primary">👍🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">👎🏻</button>
-                        <button type="button" name="" id="" class="btn btn-primary">😐</button>
-                     </div>
-                  </div>
+      if ($(this).hasClass('btn-primary')) {
+        btnlike.removeClass('btn-primary');
+        btnMhe.removeClass('btn-primary');
+       
+      }
+    });
 
                   <h5 class="card-title">Subtitulo</h5>
                   <h6 class="card-title">Tema</h6>
@@ -263,7 +249,16 @@
             </div>
          </div>
 
-      </div>
-   </body>
+      let btnLikeId = "like-" + idArticulo + "-" + idUsuario;
+      let btnLike = $("button[id=" + btnLikeId + "]");
+      let btnDislikeId = "dislike-" + idArticulo + "-" + idUsuario;
+      let btnDislike = $("button[id=" + btnDislikeId + "]");
+      if ($(this).hasClass('btn-primary')) {
+        btnLike.removeClass('btn-primary');
+        btnDislike.removeClass('btn-primary');
+      }
+    });
+  </script>
+</body>
 
 </html>
