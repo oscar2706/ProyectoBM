@@ -4,6 +4,7 @@ $db_servername = "localhost";
 $db_usuario = "root";
 $db_contrasena = "";
 $dbname = "proyectoBM";
+$idUser = 1;
 
 try {
   $conn = new PDO("mysql:host=$db_servername;dbname=$dbname", $db_usuario, $db_contrasena);
@@ -34,10 +35,33 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   $img = $row2->tipoImagen;
   $idTema = $row2->idTema;
   $idAutor = $row2->idUsuario;
-  $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor);
-  $articulos[] = $articulo;
+  $artGusta = -1;
+  $gustaSql = "SELECT reaccion FROM MeGustaArticulo WHERE idArticulo = ? and idUsuario = ?";
+  $gustaStmt = $conn->prepare($gustaSql);
+  if ($gustaStmt->execute([$id, $idUser])) {
+    $rowGusta = $gustaStmt->fetch();
+    switch ($rowGusta[0]) {
+      case 1:
+        $artGusta = 1;
+        break;
+
+      case 2:
+        $artGusta = 2;
+        break;
+
+      case 3:
+        $artGusta = 3;
+        break;
+
+      default:
+        break;
+    }
+  }
+  // echo $artGusta;
+  $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor, $idUser, $artGusta);
+  $articulos[] = $articulo; 
 }
-$idUser = 1;
+
 ?>
 
 <!DOCTYPE html>
@@ -126,9 +150,9 @@ $idUser = 1;
             <img class="card-img-top rounded" src="<?php echo $articulos[$x]->getPathImagen(); ?>">
             <div class="card-body">
               <div class="row justify-content-center mb-2">
-                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👍🏻</button>
-                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👎🏻</button>
-                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">😐</button>
+                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 1) echo "btn-primary"; ?> mx-2">👍🏻</button>
+                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 2) echo "btn-primary"; ?> mx-2">👎🏻</button>
+                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 3) echo "btn-primary"; ?> mx-2">😐</button>
               </div>
               <h3 class="card-title"><?php echo $articulos[$x]->getTitulo(); ?></h3>
               <h5 class="card-title"><?php echo $articulos[$x]->getSubtitulo(); ?></h5>
