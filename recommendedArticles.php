@@ -1,4 +1,5 @@
 <?php
+include("ClassArticulo.php");
 $db_servername = "localhost";
 $db_usuario = "root";
 $db_contrasena = "";
@@ -26,23 +27,15 @@ $result = $conn->query($sql);
 
 while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   $id = $row2->idArticulo;
-  $ids[] = $id;
   $titulo = $row2->titulo;
-  $titulos[] = $titulo;
   $subtitulo = $row2->subtitulo;
-  $subtitulos[] = $subtitulo;
   $contenido = $row2->contenido;
-  $contenidos[] = $contenido;
   $fecha = $row2->fechaCreacion;
-  $fechas[] = $fecha;
-  $imagen = $row2->imagen;
-  $imagenes[] = $imagen;
   $img = $row2->tipoImagen;
-  $images[] = $img;
   $idTema = $row2->idTema;
-  $idTemas[] = $idTema;
-  $idUsuario = $row2->idUsuario;
-  $idUsuarios[] = $idUsuario;
+  $idAutor = $row2->idUsuario;
+  $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor);
+  $articulos[] = $articulo;
 }
 $idUser = 1;
 ?>
@@ -127,22 +120,23 @@ $idUser = 1;
     <h1 class="text-center text-primary p-3">Recomendados</h1>
 
     <div class="row">
-      <?php for ($x = 0; $x < sizeof($titulos); $x++) { ?>
+      <?php for ($x = 0; $x < sizeof($articulos); $x++) { ?>
         <div class="col-sm-12 col-md-6 col-lg-4">
           <div class="shadow p-2 mb-5 bg-white rounded">
-            <img class="card-img-top rounded" src="<?php echo $images[$x]; ?>">
+            <img class="card-img-top rounded" src="<?php echo $articulos[$x]->getPathImagen(); ?>">
             <div class="card-body">
               <div class="row justify-content-center mb-2">
-                <button type="button" id="like-<?php echo $ids[$x]; ?>-<?php echo $idUser; ?>" class="btn mx-2">👍🏻</button>
-                <button type="button" id="dislike-<?php echo $ids[$x]; ?>-<?php echo $idUser; ?>" class="btn mx-2">👎🏻</button>
-                <button type="button" id="mhe-<?php echo $ids[$x]; ?>-<?php echo $idUser; ?>" class="btn mx-2">😐</button>
+                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👍🏻</button>
+                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👎🏻</button>
+                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">😐</button>
               </div>
-              <h3 class="card-title"><?php echo $titulos[$x]; ?></h3>
-              <h5 class="card-title"><?php echo $subtitulos[$x]; ?></h5>
-              <h6 class="card-title"><?php echo $idTemas[$x]; ?></h6>
-              <p class="card-text"><?php echo $contenidos[$x]; ?></p>
+              <h3 class="card-title"><?php echo $articulos[$x]->getTitulo(); ?></h3>
+              <h5 class="card-title"><?php echo $articulos[$x]->getSubtitulo(); ?></h5>
+              <h5><span class="badge badge-info"><?php echo $articulos[$x]->getTema(); ?></span></h5>
+              <!-- <h6 class="card-title"><?php echo $articulos[$x]->getTema(); ?></h6> -->
+              <p class="card-text"><?php echo $articulos[$x]->getContenido(); ?></p>
               <p class="card-text">
-                <small class="text-muted"><?php echo $fechas[$x]; ?></small>
+                <small class="text-muted"><?php echo $articulos[$x]->getFecha(); ?></small>
               </p>
             </div>
           </div>
@@ -151,6 +145,7 @@ $idUser = 1;
     </div>
 
   </div>
+
   <script>
     $("button[id|='like']").click(function() {
       console.log($(this));
@@ -160,14 +155,28 @@ $idUser = 1;
       console.log("GUSTA idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
       $(this).toggleClass("btn-primary");
 
-      let btnDislikeId ="dislike-"+idArticulo+"-"+idUsuario;
-      let btnDislike = $("button[id="+btnDislikeId+"]");
-      let btnMheId ="mhe-"+idArticulo+"-"+idUsuario;
-      let btnMhe = $("button[id="+btnMheId+"]");
+      let btnDislikeId = "dislike-" + idArticulo + "-" + idUsuario;
+      let btnDislike = $("button[id=" + btnDislikeId + "]");
+      let btnMheId = "mhe-" + idArticulo + "-" + idUsuario;
+      let btnMhe = $("button[id=" + btnMheId + "]");
 
-      if($(this).hasClass('btn-primary')){
-        btnDislike.removeClass('btn-primary')
-        btnMhe.removeClass('btn-primary')
+      if ($(this).hasClass('btn-primary')) {
+        btnDislike.removeClass('btn-primary');
+        btnMhe.removeClass('btn-primary');
+
+        let y = 0;
+        $.ajax({
+          url: 'updateLike.php',
+          method: 'POST',
+          data: {
+            idArticulo: idArticulo,
+            idUsuario: idUsuario,
+            gusta: "gusta"
+          },
+          success: function(response) {
+            // TODO: Actualizar gustos
+          }
+        });
       }
     });
 
@@ -178,14 +187,15 @@ $idUser = 1;
       console.log("Disgusta idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
       $(this).toggleClass("btn-primary");
 
-      let btnLikeId ="like-"+idArticulo+"-"+idUsuario;
-      let btnlike = $("button[id="+btnLikeId+"]");
-      let btnMheId ="mhe-"+idArticulo+"-"+idUsuario;
-      let btnMhe = $("button[id="+btnMheId+"]");
+      let btnLikeId = "like-" + idArticulo + "-" + idUsuario;
+      let btnlike = $("button[id=" + btnLikeId + "]");
+      let btnMheId = "mhe-" + idArticulo + "-" + idUsuario;
+      let btnMhe = $("button[id=" + btnMheId + "]");
 
-      if($(this).hasClass('btn-primary')){
-        btnlike.removeClass('btn-primary')
-        btnMhe.removeClass('btn-primary')
+      if ($(this).hasClass('btn-primary')) {
+        btnlike.removeClass('btn-primary');
+        btnMhe.removeClass('btn-primary');
+       
       }
     });
 
@@ -196,13 +206,13 @@ $idUser = 1;
       console.log("Mhe idArticulo:" + idArticulo + ", IdUsuario:" + idUsuario);
       $(this).toggleClass("btn-primary");
 
-      let btnLikeId ="like-"+idArticulo+"-"+idUsuario;
-      let btnLike = $("button[id="+btnLikeId+"]");
-      let btnDislikeId ="dislike-"+idArticulo+"-"+idUsuario;
-      let btnDislike = $("button[id="+btnDislikeId+"]");
-      if($(this).hasClass('btn-primary')){
-        btnLike.removeClass('btn-primary')
-        btnDislike.removeClass('btn-primary')
+      let btnLikeId = "like-" + idArticulo + "-" + idUsuario;
+      let btnLike = $("button[id=" + btnLikeId + "]");
+      let btnDislikeId = "dislike-" + idArticulo + "-" + idUsuario;
+      let btnDislike = $("button[id=" + btnDislikeId + "]");
+      if ($(this).hasClass('btn-primary')) {
+        btnLike.removeClass('btn-primary');
+        btnDislike.removeClass('btn-primary');
       }
     });
   </script>
