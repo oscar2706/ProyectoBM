@@ -4,6 +4,7 @@ $db_servername = "localhost";
 $db_usuario = "root";
 $db_contrasena = "";
 $dbname = "proyectoBM";
+$idUser = 1;
 
 try {
   $conn = new PDO("mysql:host=$db_servername;dbname=$dbname", $db_usuario, $db_contrasena);
@@ -34,10 +35,33 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   $img = $row2->tipoImagen;
   $idTema = $row2->idTema;
   $idAutor = $row2->idUsuario;
-  $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor);
+  $artGusta = -1;
+  $gustaSql = "SELECT reaccion FROM MeGustaArticulo WHERE idArticulo = ? and idUsuario = ?";
+  $gustaStmt = $conn->prepare($gustaSql);
+  if ($gustaStmt->execute([$id, $idUser])) {
+    $rowGusta = $gustaStmt->fetch();
+    switch ($rowGusta[0]) {
+      case 1:
+        $artGusta = 1;
+        break;
+
+      case 2:
+        $artGusta = 2;
+        break;
+
+      case 3:
+        $artGusta = 3;
+        break;
+
+      default:
+        break;
+    }
+  }
+  // echo $artGusta;
+  $articulo = new Articulo($id, $titulo, $subtitulo, $contenido, $fecha, $img, $idTema, $idAutor, $idUser, $artGusta);
   $articulos[] = $articulo;
 }
-$idUser = 1;
+
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +86,7 @@ $idUser = 1;
               crossorigin="anonymous"></script>
    </head>
 
+<<<<<<< HEAD
    <body>
       <?php
          include ("userClass.php");
@@ -93,6 +118,65 @@ $idUser = 1;
                </li>
             </ul>
          </div>
+=======
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="">Proyecto BM</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="recommendedArticles.html">Recomendaciones<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="userAllArticles.html">Todos los articulos<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="userArticlesByTopic.html">Por tema</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="userArticlesByLikes.html">Más gustados</a>
+        </li>
+      </ul>
+
+      <ul class="nav justify-content-end">
+        <li class="nav-item dropdown bg-light">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Menú
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="myArticles.html">Mis articulos</a>
+            <a class="dropdown-item" href="reports.html">Reportes</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal">Salir</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirme salida</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <form action="index.html">
+              <button class="btn btn-primary" type="submit">
+                Salir
+              </button>
+            </form>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+>>>>>>> oscar
 
          <ul class=" nav justify-content-end">
             <li class="nav-item dropdown bg-light">
@@ -129,24 +213,29 @@ $idUser = 1;
             </div>
          </div>
 
+<<<<<<< HEAD
       </nav>
+=======
+  <div class="container-fluid px-5">
+    <h1 class="text-center text-primary p-3">Recomendados</h1>
+>>>>>>> oscar
 
     <div class="row">
       <?php for ($x = 0; $x < sizeof($articulos); $x++) { ?>
-        <div class="col-sm-12 col-md-6 col-lg-4">
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
           <div class="shadow p-2 mb-5 bg-white rounded">
             <img class="card-img-top rounded" src="<?php echo $articulos[$x]->getPathImagen(); ?>">
             <div class="card-body">
-              <div class="row justify-content-center mb-2">
-                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👍🏻</button>
-                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">👎🏻</button>
-                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn mx-2">😐</button>
-              </div>
               <h3 class="card-title"><?php echo $articulos[$x]->getTitulo(); ?></h3>
               <h5 class="card-title"><?php echo $articulos[$x]->getSubtitulo(); ?></h5>
               <h5><span class="badge badge-pill badge-info"><?php echo $articulos[$x]->getTema(); ?></span></h5>
               <!-- <h6 class="card-title"><?php echo $articulos[$x]->getTema(); ?></h6> -->
               <p class="card-text"><?php echo $articulos[$x]->getContenido(); ?></p>
+              <div class="row justify-content-center mb-2">
+                <button type="button" id="like-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 1) echo "btn-primary"; ?> mx-2">👍🏻</button>
+                <button type="button" id="dislike-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 2) echo "btn-primary"; ?> mx-2">👎🏻</button>
+                <button type="button" id="mhe-<?php echo $articulos[$x]->getId(); ?>-<?php echo $idUser; ?>" class="btn <?php if ($articulos[$x]->getGusta() == 3) echo "btn-primary"; ?> mx-2">😐</button>
+              </div>
               <p class="card-text">
                 <small class="text-muted"><?php echo $articulos[$x]->getFecha(); ?></small>
               </p>
@@ -160,7 +249,6 @@ $idUser = 1;
 
   <script>
     $("button[id|='like']").click(function() {
-      console.log($(this));
       var idBoton = $(this).attr('id');
       idArticulo = idBoton.charAt(5);
       idUsuario = idBoton.charAt(7);
@@ -188,7 +276,7 @@ $idUser = 1;
             if (response == "Guardado")
               alert("Se guardo");
             else
-              alert("ERROR:", response);
+              alert(response);
             // TODO: Actualizar gustos
           }
         });
@@ -244,7 +332,7 @@ $idUser = 1;
             if (response == "Guardado")
               alert("Se guardo");
             else
-              alert("ERROR:", response);
+              alert(response);
             // TODO: Actualizar gustos
           }
         });
