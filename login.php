@@ -25,14 +25,32 @@
          <div class="row">
             <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
                <div class="card my-5">
+                  <?php 
+                     session_start();
+
+                     
+                     if(isset($_SESSION['bandera']))
+                     {
+                        $error = $_SESSION['bandera'];
+                     }
+                     else {
+                        $error = 0;
+                     }
+
+                     if($error==1)
+                     {
+                        echo "<div class=\"text-center text-danger h3\">Usuario o Contraseña Incorrecta</div>";
+                     }
+
+                  ?>
                   <div class="card-body">
                      <h5 class="card-title text-center">Inicio de sesión</h5>
-                     <form action="loginCheck.php">
+                     <form action="loginCheck.php" method="post">
                         <label for="inputUserName">Nombre de usuario</label>
-                        <input type="text" id="inputUserName" class="form-control" required
+                        <input type="text" id="inputUserName" name="inputUserName" class="form-control" required
                                autofocus>
                         <label for="inputPassword">Contraseña</label>
-                        <input type="password" id="inputPassword" class="form-control" required>
+                        <input type="password" id="inputPassword" name="inputPassword" class="form-control" required>
                         <button class="btn btn-primary btn-block text-uppercase mt-4" type="submit">Iniciar
                            sesión</button>
                      </form>
@@ -45,7 +63,7 @@
                <div class="card">
                   <div class="card-body">
                      <p class="card-title text-center">¿Nuevo en Proyecto BM?</p>
-                     <form action="signUp.html">
+                     <form action="signUp.php">
                         <button class="btn btn-secondary btn-block" type="submit">Registrarse</button>
                      </form>
                   </div>
