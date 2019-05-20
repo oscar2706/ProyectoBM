@@ -1,29 +1,17 @@
 <?php
 include("ClassArticulo.php");
-
-$db_servername = "localhost";
-$db_usuario = "root";
-$db_contrasena = "";
-$dbname = "proyectoBM";
-
+include("userClass.php");
+include("connection.php");
+session_start();
 $idArticulo = $_POST['idArticulo'];
-$idUsuario = $_POST['idUsuario']; //Usar la variable de sesion con idUsuario
+// $idUsuario = $_POST['idUsuario']; //Usar la variable de sesion con idUsuario
 $reaccion = $_POST['reaccion'];
-
-try {
-	$conn = new PDO("mysql:host=$db_servername;dbname=$dbname", $db_usuario, $db_contrasena);
-	// set the PDO error mode to exception
-	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$conn->exec("SET NAMES 'utf8';");
-} catch (PDOException $e) {
-	echo $sql . "<br>" . $e->getMessage();
-}
+$idUsuario = $_SESSION['usuario']->getIdUsuario();
 
 $sql = "SELECT idTema FROM Articulo WHERE idArticulo = ?";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$idArticulo]);
 $idTema = $stmt->fetch();
-// echo "idTema= ",$idTema[0];
 
 //1=gusta, 2=disgusta y 3=mhe
 $sql = "SELECT reaccion FROM MeGustaArticulo WHERE idUsuario = ? AND idArticulo = ?";
@@ -32,7 +20,7 @@ $stmt->execute([$idUsuario, $idArticulo]);
 
 $gustaRegistrado = false;
 
-if ($stmt->rowCount() == 1) {	//ReaccionRegistrada
+if ($stmt->rowCount() > 0) {	//ReaccionRegistrada
 	$gustaUsuario = $stmt->fetch();
 	$gustaRegistrado = true;
 
@@ -114,7 +102,6 @@ if ($stmt->rowCount() == 1) {	//ReaccionRegistrada
 				$gustaTema[0] -= 1;
 				break;
 		}
-		echo "gustaTema = ", $gustaTema[0];
 		$sql = "UPDATE MeGustaTema SET meGusta = ? WHERE idUsuario = ? AND idTema = ?";
 		$stmt = $conn->prepare($sql);
 		$stmt->execute([$gustaTema[0], $idUsuario, $idTema[0]]);

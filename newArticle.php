@@ -1,17 +1,10 @@
 <?php
-$db_servername = "localhost";
-$db_usuario = "root";
-$db_contrasena = "";
-$dbname = "proyectoBM";
+include("ClassArticulo.php");
+include("userClass.php");
+include("connection.php");
+session_start();
+$idUser = $_SESSION['usuario']->getIdUsuario();
 
-try {
-  $conn = new PDO("mysql:host=$db_servername;dbname=$dbname", $db_usuario, $db_contrasena);
-  // set the PDO error mode to exception
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $conn->exec("SET NAMES 'utf8';");
-} catch (PDOException $e) {
-  echo $sql . "<br>" . $e->getMessage();
-}
 $sql = "SELECT nombre FROM Tema";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -20,17 +13,6 @@ while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
   $tema = $row->nombre;
   $temas[] = $tema;
 }
-$articuloId = 1;
-
-//Consulta de la imagen
-$sql = "SELECT tipoImagen FROM Articulo WHERE idArticulo = 2";
-$result = $conn->query($sql);
-
-while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
-  $img = $row2->tipoImagen;
-  $images[] = $img;
-}
-// print_r($images);
 
 ?>
 <!DOCTYPE html>
@@ -51,15 +33,14 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
   <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
 </head>
 
-<body>
+<body class="bg-light">
   <div class="container">
     <div class="row">
       <div class="col-8 mx-auto">
-        <div class="card my-5 bg-light">
+        <div class="card my-5">
           <div class="card-body">
             <h2 class="card-title text-center text-primary">Nuevo articulo</h2>
             <form action="insertArticle.php" method="post" enctype="multipart/form-data">
-              <img src="<?php echo $images[0]; ?>" class="img-fluid rounded mx-auto d-block">
               <div class="form-group">
                 <label for="inputTitle">Titulo</label>
                 <input name="titulo" type="text" class="form-control" required autofocus>

@@ -1,9 +1,13 @@
 <?php
+include("userClass.php");
+include("connection.php");
+session_start();
+$idUsiario = $_SESSION['usuario']->getIdUsuario();
+
 $titulo = $_POST['titulo'];
 $subtitulo = $_POST['subtitulo'];
 $contenido = $_POST['contenido'];
 $idTema = $_POST['tema'];
-$idUsuario = 1;
 
 $target_dir = "uploads/";
 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
@@ -46,35 +50,24 @@ if ($uploadOk == 0) {
    }
 }
 
-$db_servername = "localhost";
-$db_usuario = "root";
-$db_contrasena = "";
-$dbname = "proyectoBM";
-try {
-   $conn = new PDO("mysql:host=$db_servername;dbname=$dbname", $db_usuario, $db_contrasena);
-   // set the PDO error mode to exception
-   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-   $conn->exec("SET NAMES 'utf8';");
-} catch (PDOException $e) {
-   echo $sql . "<br>" . $e->getMessage();
-}
-
 $tmpName  = $_FILES['fileToUpload']['tmp_name'];
 $fp = fopen($tmpName, 'rb');
 $hoy = date("Y-m-d");
 $stmt = $conn->prepare("INSERT INTO Articulo ( titulo, subtitulo, contenido, fechaCreacion, imagen, tipoImagen, idTema, idUsuario ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )");
 
-if ($stmt->execute([$titulo, $subtitulo, $contenido, date("Y-m-d"), $fp, $target_file, $idTema, 1]))
+if ($stmt->execute([$titulo, $subtitulo, $contenido, date("Y-m-d"), $fp, $target_file, $idTema, $idUsiario])) {
    echo 'Se registro el articulo con la imagen <br>';
-else
+   header('Location: myArticles.php');
+} else {
    echo 'No se registro el articulo!';
-echo '<br>';
-echo '<br>';
-echo $titulo . "<br>";
-echo $subtitulo . "<br>";
-echo $contenido . "<br>";
-echo $idTema . "<br>";
-echo $target_file . "target <br>";
-echo $tmpName . ": tmpName <br>";
-echo $fp . "fp <br>";
-// echo $tmpName . "tmpname <br>";
+   echo '<br>';
+   echo '<br>';
+   echo "idUsuario:", $idUsiario . "<br>";
+   echo "titulo:", $titulo . "<br>";
+   echo "subtitulo:", $subtitulo . "<br>";
+   echo "contenido:", $contenido . "<br>";
+   echo "idTema:", $idTema . "<br>";
+   echo "targetFile:", $target_file . "target <br>";
+   echo "tmpName:", $tmpName . ": tmpName <br>";
+   echo "fp:", $fp . "fp <br>";
+}

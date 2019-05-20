@@ -3,7 +3,7 @@
         function getTemas() {
             include ("connection.php");
 
-            $statement = "SELECT * FROM tema";
+            $statement = "SELECT * FROM Tema";
             $query = $conn->prepare($statement);
             $query->execute();
                            
@@ -21,7 +21,7 @@
         function getTemasId() {
             include ("connection.php");
 
-            $statement = "SELECT * FROM tema";
+            $statement = "SELECT * FROM Tema";
             $query = $conn->prepare($statement);
             $query->execute();
                            
@@ -40,7 +40,7 @@
             include ("connection.php");
             include ("userClass.php");
 
-            $statement = "INSERT INTO usuario (nombre, contraseña, edad, idGenero, idEstadoCivil) VALUES (:nombre, :contrasena, :edad, :idGenero, :idEstadoCivil)";
+            $statement = "INSERT INTO Usuario (nombre, contraseña, edad, idGenero, idEstadoCivil) VALUES (:nombre, :contrasena, :edad, :idGenero, :idEstadoCivil)";
             $query = $conn->prepare($statement);
             $query->bindParam(':nombre', $nombre, PDO::PARAM_STR);
             $query->bindParam(':contrasena', $contraseña, PDO::PARAM_STR);
@@ -49,13 +49,13 @@
             $query->bindParam(':idEstadoCivil', $idEstadoCivil, PDO::PARAM_INT);
             $query->execute();
 
-            $statement2 = "SELECT * FROM usuario ORDER BY idUsuario desc";
+            $statement2 = "SELECT * FROM Usuario ORDER BY idUsuario desc";
             $query2 = $conn->prepare($statement2);
             $query2->execute();
             $usuario = $query2->fetch(PDO::FETCH_OBJ);
 
             $valorInicial = 0;
-            $statement3 = "INSERT INTO megustatema (idUsuario, idTema, meGusta) VALUES (:idUsuario1, :idTema1, :meGusta1), 
+            $statement3 = "INSERT INTO MeGustaTema (idUsuario, idTema, meGusta) VALUES (:idUsuario1, :idTema1, :meGusta1), 
             (:idUsuario2, :idTema2, :meGusta2), (:idUsuario3, :idTema3, :meGusta3)";
             $query3 = $conn->prepare($statement3);
             $query3->bindParam(':idUsuario1', $usuario->idUsuario, PDO::PARAM_INT);
@@ -78,7 +78,7 @@
             include ("connection.php");
             include ("userClass.php");
 
-            $statement = "SELECT count(*) AS filas FROM usuario WHERE nombre = :nombre AND contraseña = :contrasena";
+            $statement = "SELECT count(*) AS filas FROM Usuario WHERE nombre = :nombre AND contraseña = :contrasena";
             $query = $conn->prepare($statement);
             $query->bindParam(':nombre', $nombre, PDO::PARAM_STR);
             $query->bindParam(':contrasena', $contraseña, PDO::PARAM_STR);
@@ -89,7 +89,7 @@
 
             if($filas->filas > 0)
             {
-                $statement2 = "SELECT * FROM usuario WHERE nombre = :nombre AND contraseña = :contrasena";
+                $statement2 = "SELECT * FROM Usuario WHERE nombre = :nombre AND contraseña = :contrasena";
                 $query2 = $conn->prepare($statement2);
                 $query2->bindParam(':nombre', $nombre, PDO::PARAM_STR);
                 $query2->bindParam(':contrasena', $contraseña, PDO::PARAM_STR);
