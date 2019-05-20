@@ -50,9 +50,6 @@ while ($row2 = $result->fetch(PDO::FETCH_OBJ)) {
           <a class="nav-link" href="index.php">Todos los articulos<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="articlesByTopic.php">Por tema</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="articlesByLikes.php">Más gustados</a>
         </li>
       </ul>

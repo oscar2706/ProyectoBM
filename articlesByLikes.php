@@ -85,9 +85,6 @@ for ($i = 0; $i < $idTemasSize; $i++) {
             <li class="nav-item">
                <a class="nav-link" href="index.php">Todos los articulos<span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
-               <a class="nav-link" href="articlesByTopic.php">Por tema</a>
-            </li>
             <li class="nav-item active">
                <a class="nav-link" href="articlesByLikes.php">Más gustados</a>
             </li>

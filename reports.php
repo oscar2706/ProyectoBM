@@ -4,49 +4,56 @@ include("userClass.php");
 include("connection.php");
 session_start();
 $idUser = $_SESSION['usuario']->getIdUsuario();
-$sql = "SELECT idTema, SUM(meGusta) as meGusta FROM MeGustaTema as M INNER JOIN Usuario as U on M.idUsuario = U.idUsuario WHERE U.idGenero = 1 GROUP BY M.idTema ORDER BY meGusta DESC";
+$sql = "SELECT T.nombre, SUM(M.meGusta) as meGusta FROM Tema as T INNER JOIN MeGustaTema AS M ON T.idTema = M.idTema INNER JOIN Usuario AS U ON M.idUsuario = U.idUsuario WHERE U.idGenero = 1 and M.meGusta >0 GROUP BY M.idTema ORDER BY meGusta DESC";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
-echo "TemaGusta Hombres<br>";
+// echo "TemaGusta Hombres<br>";
 while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
-   $idTemaHombre = $row->idTema;
+   $temaHombre = $row->nombre;
    $meGustaHombre = $row->meGusta;
-   echo "id:",$idTemaHombre,", reaccion:",$meGustaHombre,"<br>";
+   $temasHombre[] = $temaHombre;
+   $meGustasHombre[] = $meGustaHombre;
+   // echo "categoria:", $temaHombre, ", reaccion:", $meGustaHombre, "<br>";
 }
-echo"<br>";
+// echo "<br>";
 
-$sql = "SELECT idTema, SUM(meGusta) as meGusta FROM MeGustaTema as M INNER JOIN Usuario as U on M.idUsuario = U.idUsuario WHERE U.idGenero = 2 GROUP BY M.idTema ORDER BY meGusta DESC";
+$sql = "SELECT T.nombre, SUM(M.meGusta) as meGusta FROM Tema as T INNER JOIN MeGustaTema AS M ON T.idTema = M.idTema INNER JOIN Usuario AS U ON M.idUsuario = U.idUsuario WHERE U.idGenero = 2 and M.meGusta >0 GROUP BY M.idTema ORDER BY meGusta DESC";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
-echo "TemaGusta Mujeres<br>";
+// echo "TemaGusta Mujeres<br>";
 while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
-   $idTemaMujer = $row->idTema;
+   $temaMujer = $row->nombre;
    $meGustaMujer = $row->meGusta;
-   echo "id:",$idTemaMujer,", reaccion:",$meGustaMujer,"<br>";
+   $temasMujer[] = $temaMujer;
+   $meGustasMujer[] = $meGustaMujer;
+   // echo "id:", $temaMujer, ", reaccion:", $meGustaMujer, "<br>";
 }
-echo"<br>";
+// echo "<br>";
 
-$sql = "SELECT idTema, SUM(meGusta) as meGusta FROM MeGustaTema as M INNER JOIN Usuario as U on M.idUsuario = U.idUsuario WHERE U.edad >= 18 GROUP BY M.idTema ORDER BY meGusta DESC";
+$sql = "SELECT T.nombre, SUM(M.meGusta) as meGusta FROM Tema as T INNER JOIN MeGustaTema AS M ON T.idTema = M.idTema INNER JOIN Usuario AS U ON M.idUsuario = U.idUsuario WHERE U.edad >= 18 and M.meGusta >0 GROUP BY M.idTema ORDER BY meGusta DESC";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
-echo "TemaGusta Edad >=18 <br>";
+// echo "TemaGusta Edad >=18 <br>";
 while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
-   $idTemaMujer = $row->idTema;
-   $meGustaMujer = $row->meGusta;
-   echo "id:",$idTemaMujer,", reaccion:",$meGustaMujer,"<br>";
+   $temaMayor = $row->nombre;
+   $meGustaMayor = $row->meGusta;
+   $temasMayor[] = $temaMayor;
+   $meGustasMayor[] = $meGustaMayor;
+   // echo "id:", $temaMayor, ", reaccion:", $meGustaMayor, "<br>";
 }
-echo"<br>";
+// echo "<br>";
 
-$sql = "SELECT idTema, SUM(meGusta) as meGusta FROM MeGustaTema as M INNER JOIN Usuario as U on M.idUsuario = U.idUsuario WHERE U.edad < 18 GROUP BY M.idTema ORDER BY meGusta DESC";
+$sql = "SELECT T.nombre, SUM(M.meGusta) as meGusta FROM Tema as T INNER JOIN MeGustaTema AS M ON T.idTema = M.idTema INNER JOIN Usuario AS U ON M.idUsuario = U.idUsuario WHERE U.edad < 18 and M.meGusta >0 GROUP BY M.idTema ORDER BY meGusta DESC";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
-echo "TemaGusta Edad <18 <br>";
+// echo "TemaGusta Edad <18 <br>";
 while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
-   $idTemaMujer = $row->idTema;
-   $meGustaMujer = $row->meGusta;
-   echo "id:",$idTemaMujer,", reaccion:",$meGustaMujer,"<br>";
+   $temaMenor = $row->nombre;
+   $meGustaMenor = $row->meGusta;
+   $temasMenor[] = $temaMenor;
+   $meGustasMenor[] = $meGustaMenor;
+   // echo "id:", $temaMenor, ", reaccion:", $meGustaMenor, "<br>";
 }
-echo"<br>";
 ?>
 <!DOCTYPE html>
 <html lang="es_MX">
@@ -78,9 +85,6 @@ echo"<br>";
             </li>
             <li class="nav-item">
                <a class="nav-link" href="userAllArticles.php">Todos los articulos<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link" href="userArticlesByTopic.php">Por tema</a>
             </li>
             <li class="nav-item">
                <a class="nav-link" href="userArticlesByLikes.php">Más gustados</a>
@@ -135,21 +139,34 @@ echo"<br>";
                </tr>
             </thead>
             <tbody>
-               <tr>
-                  <th scope="row">1</th>
-                  <td>Mark</td>
-                  <td>Otto</td>
-               </tr>
-               <tr>
-                  <th scope="row">2</th>
-                  <td>Jacob</td>
-                  <td>Thornton</td>
-               </tr>
-               <tr>
-                  <th scope="row">3</th>
-                  <td>Larry</td>
-                  <td>the Bird</td>
-               </tr>
+               <?php for ($x = 0; $x < sizeof($temasHombre); $x++) { ?>
+                  <tr>
+                     <th scope="row"><?php echo $temasHombre[$x]; ?></th>
+                     <td>Hombre</td>
+                     <td><?php echo $meGustasHombre[$x]; ?></td>
+                  </tr>
+               <?php } ?>
+               <?php for ($x = 0; $x < sizeof($temasMujer); $x++) { ?>
+                  <tr>
+                     <th scope="row"><?php echo $temasMujer[$x]; ?></th>
+                     <td>Mujer</td>
+                     <td><?php echo $meGustasMujer[$x]; ?></td>
+                  </tr>
+               <?php } ?>
+               <?php for ($x = 0; $x < sizeof($temasMayor); $x++) { ?>
+                  <tr>
+                     <th scope="row"><?php echo $temasMayor[$x]; ?></th>
+                     <td>>= 18</td>
+                     <td><?php echo $meGustasMayor[$x]; ?></td>
+                  </tr>
+               <?php } ?>
+               <?php for ($x = 0; $x < sizeof($temasMenor); $x++) { ?>
+                  <tr>
+                     <th scope="row"><?php echo $temasMenor[$x]; ?></th>
+                     <td>< 18</td>
+                     <td><?php echo $meGustasMenor[$x]; ?></td>
+                  </tr>
+               <?php } ?>
             </tbody>
          </table>
       </div>

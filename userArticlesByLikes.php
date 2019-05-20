@@ -7,7 +7,7 @@ session_start();
 $idUser = $_SESSION['usuario']->getIdUsuario();
 // echo "idUsuario = ",$idUser , "<br>";
 
-$sql = "SELECT idArticulo, COUNT(reaccion) AS gusta FROM MeGustaArticulo WHERE reaccion = ? GROUP BY idArticulo ORDER BY gusta DESC LIMIT 3";
+$sql = "SELECT idArticulo, COUNT(reaccion) AS gusta FROM MeGustaArticulo WHERE reaccion = ? GROUP BY idArticulo ORDER BY gusta DESC LIMIT 5";
 $stmt = $conn->prepare($sql);
 $stmt->execute([1]);
 while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
@@ -87,9 +87,6 @@ for ($i = 0; $i < $idTemasSize; $i++) {
             </li>
             <li class="nav-item">
                <a class="nav-link" href="userAllArticles.php">Todos los articulos<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link" href="userArticlesByTopic.php">Por tema</a>
             </li>
             <li class="nav-item active">
                <a class="nav-link" href="userArticlesByLikes.php">Más gustados</a>

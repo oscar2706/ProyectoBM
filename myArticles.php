@@ -78,9 +78,6 @@ else{
           <a class="nav-link" href="userAllArticles.php">Todos los articulos<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="userArticlesByTopic.php">Por tema</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="userArticlesByLikes.php">Más gustados</a>
         </li>
       </ul>
